@@ -1,4 +1,4 @@
-import { users } from "./user";
+const { users } = require('./user')
 const http = require('http');
 const fs = require('fs').promises;
 
@@ -33,9 +33,8 @@ http.createServer(async (req, res) => {
         });
         // 요청의 body를 다 받은 후 실행됨
         return req.on('end', () => {
-          console.log('POST 본문(Body):', body);
-          const { name } = JSON.parse(body);
-          users[checkId].name = name;
+          const { name, age } = JSON.parse(body);
+          users.push({id: checkId, name: name, age: age})
           res.writeHead(201, { 'Content-Type': 'text/plain; charset=utf-8' });
           res.end('ok');
         });
@@ -75,8 +74,11 @@ http.createServer(async (req, res) => {
   });
 
 const checkId = () => {
-  while(users.map(user => user.id).find(id)) {
-    id++;
+  let id = 1;
+  while(true) {
+    if(!users.map(user => user.id).find(id)) {
+      return id;
+    }
+    else id++;
   }
-  return id;
 }
