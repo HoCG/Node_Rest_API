@@ -1,7 +1,6 @@
+import { users } from "./user";
 const http = require('http');
 const fs = require('fs').promises;
-
-const users = {}; // 데이터 저장용
 
 http.createServer(async (req, res) => {
   try {
@@ -36,8 +35,7 @@ http.createServer(async (req, res) => {
         return req.on('end', () => {
           console.log('POST 본문(Body):', body);
           const { name } = JSON.parse(body);
-          const id = Date.now();
-          users[id] = name;
+          users[checkId].name = name;
           res.writeHead(201, { 'Content-Type': 'text/plain; charset=utf-8' });
           res.end('ok');
         });
@@ -51,7 +49,7 @@ http.createServer(async (req, res) => {
         });
         return req.on('end', () => {
           console.log('PUT 본문(Body):', body);
-          users[key] = JSON.parse(body).name;
+          users[key].name = JSON.parse(body).name;
           res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
           return res.end('ok');
         });
@@ -75,3 +73,10 @@ http.createServer(async (req, res) => {
   .listen(8082, () => {
     console.log('8082번 포트에서 서버 대기 중입니다');
   });
+
+const checkId = () => {
+  while(users.map(user => user.id).find(id)) {
+    id++;
+  }
+  return id;
+}
